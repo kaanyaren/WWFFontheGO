@@ -19,6 +19,11 @@ admin.initializeApp({
 
 
 const db = admin.firestore();
+// Increase timeout for large migrations
+db.settings({
+    ignoreUndefinedProperties: true,
+    preferRest: true, // Sometimes more stable for huge migrations in serverless environments
+});
 
 async function sync() {
   console.log("Fetching CSV...");
@@ -36,51 +41,53 @@ async function sync() {
     skip_empty_lines: true
   });
 
-  console.log(`Total records from CSV: ${records.length}`);
-
   const activeParks = records.filter(r => r.status === 'active');
-  console.log(`Active parks: ${activeParks.length}`);
-
   const totalToSync = activeParks.length;
-  let batch = db.batch();
-  let count = 0;
-  let batchCount = 0;
+  console.log(`Total records from CSV: ${records.length}`);
+  console.log(`Active parks: ${totalToSync}`);
 
-  for (const park of activeParks) {
-    const docRef = db.collection('parks').doc(park.reference);
-    
-    let lat = parseFloat(park.latitude);
-    let lon = parseFloat(park.longitude);
+  const BATCH_SIZE = 500;
+  const CONCURRENCY = 10; // Process 10 batches in parallel
+  let currentCount = 0;
+  
+  const chunks = [];
+  for (let i = 0; i < activeParks.length; i += BATCH_SIZE) {
+    chunks.push(activeParks.slice(i, i + BATCH_SIZE));
+  }
 
-    // Handheld verification: if coordinates are invalid, we leave as null
-    // or we could try to look them up. 
-    // Given the scale, individual lookups during sync is risky.
-    
-    batch.set(docRef, {
-      reference: park.reference,
-      name: park.name,
-      state: park.state,
-      latitude: isNaN(lat) ? null : lat,
-      longitude: isNaN(lon) ? null : lon,
-      lastUpdated: admin.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
+  console.log(`Split into ${chunks.length} batches. Syncing with concurrency ${CONCURRENCY}...`);
 
-    count++;
-    batchCount++;
-
-    if (batchCount >= 500) {
+  for (let i = 0; i < chunks.length; i += CONCURRENCY) {
+    const pool = chunks.slice(i, i + CONCURRENCY).map(async (chunk, index) => {
+      const batch = db.batch();
+      chunk.forEach(park => {
+        const docRef = db.collection('parks').doc(park.reference);
+        let lat = parseFloat(park.latitude);
+        let lon = parseFloat(park.longitude);
+        
+        batch.set(docRef, {
+          reference: park.reference,
+          name: park.name,
+          state: park.state,
+          latitude: isNaN(lat) ? null : lat,
+          longitude: isNaN(lon) ? null : lon,
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      });
+      
       await batch.commit();
-      console.log(`Committed ${count}/${totalToSync} parks...`);
-      batch = db.batch();
-      batchCount = 0;
-    }
+      currentCount += chunk.length;
+      console.log(`Progress: ${currentCount}/${totalToSync} parks synced...`);
+    });
+
+    await Promise.all(pool);
   }
 
-  if (batchCount > 0) {
-    await batch.commit();
-  }
-
-  console.log(`Successfully synced ${count} parks to Firestore.`);
+  console.log(`Successfully synced all ${currentCount} parks to Firestore.`);
 }
 
-sync().catch(console.error);
+sync().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
+

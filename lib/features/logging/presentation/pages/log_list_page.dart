@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/glass_card.dart';
+import '../../../../core/widgets/animated_list_item.dart';
 import '../../data/repositories/qso_repository.dart';
 import '../../domain/models/qso_log.dart';
 import '../../../../core/utils/adif_generator.dart';
@@ -14,6 +16,7 @@ class LogListPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final qsoListAsync = ref.watch(qsoListProvider);
+    final brightness = Theme.of(context).brightness;
 
     return Scaffold(
       appBar: AppBar(
@@ -38,13 +41,20 @@ class LogListPage extends ConsumerWidget {
       body: qsoListAsync.when(
         data: (logs) {
           if (logs.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.history_outlined, size: 64, color: Colors.blueGrey),
-                  SizedBox(height: 16),
-                  Text('No logs yet. Start an activation!'),
+                  Icon(
+                    Icons.history_outlined,
+                    size: 64,
+                    color: AppColors.subtext(brightness).withOpacity(0.4),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No logs yet. Start an activation!',
+                    style: TextStyle(color: AppColors.subtext(brightness)),
+                  ),
                 ],
               ),
             );
@@ -55,49 +65,90 @@ class LogListPage extends ConsumerWidget {
             itemCount: logs.length,
             itemBuilder: (context, index) {
               final log = logs[index];
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: GlassCard(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      _buildInfoColumn(log.callsign, log.band, log.mode),
-                      const Spacer(),
-                      _buildDateColumn(log.qsoDate, log.timeOn),
-                      const SizedBox(width: 16),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                        onPressed: () => _confirmDelete(context, ref, log),
+              return AnimatedListItem(
+                index: index,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: ScaleOnTap(
+                    child: GlassCard(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          _buildInfoColumn(context, log.callsign, log.band, log.mode, brightness),
+                          const Spacer(),
+                          _buildDateColumn(log.qsoDate, log.timeOn, brightness),
+                          const SizedBox(width: 16),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                            onPressed: () => _confirmDelete(context, ref, log, brightness),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               );
             },
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(
+          child: CircularProgressIndicator(
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 60), // Room for bottom bar
-        child: FloatingActionButton(
-          onPressed: () {
-            context.push('/log/new');
-          },
-          child: const Icon(Icons.add),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: [
+                AppColors.primaryGreen,
+                AppColors.primaryGreen.withOpacity(0.8),
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryGreen.withOpacity(0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: FloatingActionButton(
+            onPressed: () {
+              context.push('/log/new');
+            },
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: const Icon(Icons.add),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildInfoColumn(String callsign, String band, String mode) {
+  Widget _buildInfoColumn(
+    BuildContext context,
+    String callsign,
+    String band,
+    String mode,
+    Brightness brightness,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           callsign,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: brightness == Brightness.dark
+                ? AppColors.darkOnSurface
+                : Colors.black87,
+          ),
         ),
         const SizedBox(height: 4),
         Row(
@@ -105,19 +156,41 @@ class LogListPage extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
+                color: AppColors.primaryGreen.withOpacity(
+                  brightness == Brightness.dark ? 0.2 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text(band, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+              child: Text(
+                band,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: brightness == Brightness.dark
+                      ? AppColors.secondaryGreen
+                      : AppColors.primaryGreen,
+                ),
+              ),
             ),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
+                color: Colors.blue.withOpacity(
+                  brightness == Brightness.dark ? 0.15 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text(mode, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+              child: Text(
+                mode,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: brightness == Brightness.dark
+                      ? Colors.blue.shade300
+                      : Colors.blue,
+                ),
+              ),
             ),
           ],
         ),
@@ -125,25 +198,62 @@ class LogListPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildDateColumn(DateTime date, String time) {
+  Widget _buildDateColumn(DateTime date, String time, Brightness brightness) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(DateFormat('yyyy-MM-dd').format(date), style: const TextStyle(fontSize: 12, color: Colors.grey)),
-        Text('${time.substring(0, 2)}:${time.substring(2, 4)} UTC', 
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+        Text(
+          DateFormat('yyyy-MM-dd').format(date),
+          style: TextStyle(
+            fontSize: 12,
+            color: AppColors.subtext(brightness),
+          ),
+        ),
+        Text(
+          '${time.substring(0, 2)}:${time.substring(2, 4)} UTC',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: brightness == Brightness.dark
+                ? AppColors.darkOnSurface
+                : Colors.black87,
+          ),
+        ),
       ],
     );
   }
 
-  void _confirmDelete(BuildContext context, WidgetRef ref, QsoLog log) {
+  void _confirmDelete(
+    BuildContext context,
+    WidgetRef ref,
+    QsoLog log,
+    Brightness brightness,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Log?'),
-        content: Text('Are you sure you want to delete the QSO with ${log.callsign}?'),
+        title: Text(
+          'Delete Log?',
+          style: TextStyle(
+            color: brightness == Brightness.dark
+                ? AppColors.darkOnSurface
+                : Colors.black87,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete the QSO with ${log.callsign}?',
+          style: TextStyle(
+            color: AppColors.subtext(brightness),
+          ),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: AppColors.subtext(brightness)),
+            ),
+          ),
           TextButton(
             onPressed: () {
               ref.read(qsoRepositoryProvider).deleteLog(log.id);

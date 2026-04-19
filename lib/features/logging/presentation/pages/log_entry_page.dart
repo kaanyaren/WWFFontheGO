@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/glass_card.dart';
 import '../../data/repositories/qso_repository.dart';
 import '../../domain/models/qso_log.dart';
@@ -17,13 +18,14 @@ class LogEntryPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(userProfileProvider);
-    
+    final brightness = Theme.of(context).brightness;
+
     final callsignController = useTextEditingController(text: preFillSpot?.callsign ?? '');
     final rstSentController = useTextEditingController(text: '59');
     final rstRcvdController = useTextEditingController(text: '59');
     final sigInfoController = useTextEditingController(text: preFillSpot?.wwff ?? '');
     final commentController = useTextEditingController(text: preFillSpot?.comments ?? '');
-    
+
     final selectedBand = useState(preFillSpot != null ? _freqToBand(preFillSpot!.freq) : '20m');
     final selectedMode = useState(preFillSpot?.mode ?? 'SSB');
 
@@ -33,7 +35,14 @@ class LogEntryPage extends HookConsumerWidget {
       ),
       body: profileAsync.when(
         data: (profile) {
-          if (profile == null) return const Center(child: Text('Please set up your profile first.'));
+          if (profile == null) {
+            return Center(
+              child: Text(
+                'Please set up your profile first.',
+                style: TextStyle(color: AppColors.subtext(brightness)),
+              ),
+            );
+          }
 
           return ListView(
             padding: const EdgeInsets.all(20),
@@ -43,9 +52,14 @@ class LogEntryPage extends HookConsumerWidget {
                   children: [
                     TextFormField(
                       controller: callsignController,
+                      style: TextStyle(
+                        color: brightness == Brightness.dark
+                            ? AppColors.darkOnSurface
+                            : Colors.black87,
+                      ),
                       decoration: const InputDecoration(
                         labelText: 'Hunter Callsign',
-                        prefixIcon: Icon(Icons.search),
+                        prefixIcon: Icon(Icons.search_rounded),
                         hintText: 'e.g. K1ABC',
                       ),
                       textCapitalization: TextCapitalization.characters,
@@ -57,6 +71,14 @@ class LogEntryPage extends HookConsumerWidget {
                           child: DropdownButtonFormField<String>(
                             value: selectedBand.value,
                             decoration: const InputDecoration(labelText: 'Band'),
+                            dropdownColor: brightness == Brightness.dark
+                                ? AppColors.darkSurface
+                                : Colors.white,
+                            style: TextStyle(
+                              color: brightness == Brightness.dark
+                                  ? AppColors.darkOnSurface
+                                  : Colors.black87,
+                            ),
                             items: ['80m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', '6m', '2m']
                                 .map((b) => DropdownMenuItem(value: b, child: Text(b)))
                                 .toList(),
@@ -68,6 +90,14 @@ class LogEntryPage extends HookConsumerWidget {
                           child: DropdownButtonFormField<String>(
                             value: selectedMode.value,
                             decoration: const InputDecoration(labelText: 'Mode'),
+                            dropdownColor: brightness == Brightness.dark
+                                ? AppColors.darkSurface
+                                : Colors.white,
+                            style: TextStyle(
+                              color: brightness == Brightness.dark
+                                  ? AppColors.darkOnSurface
+                                  : Colors.black87,
+                            ),
                             items: ['SSB', 'CW', 'FT8', 'FM', 'AM', 'DATA']
                                 .map((m) => DropdownMenuItem(value: m, child: Text(m)))
                                 .toList(),
@@ -82,6 +112,11 @@ class LogEntryPage extends HookConsumerWidget {
                         Expanded(
                           child: TextFormField(
                             controller: rstSentController,
+                            style: TextStyle(
+                              color: brightness == Brightness.dark
+                                  ? AppColors.darkOnSurface
+                                  : Colors.black87,
+                            ),
                             decoration: const InputDecoration(labelText: 'RST Sent'),
                             keyboardType: TextInputType.number,
                           ),
@@ -90,6 +125,11 @@ class LogEntryPage extends HookConsumerWidget {
                         Expanded(
                           child: TextFormField(
                             controller: rstRcvdController,
+                            style: TextStyle(
+                              color: brightness == Brightness.dark
+                                  ? AppColors.darkOnSurface
+                                  : Colors.black87,
+                            ),
                             decoration: const InputDecoration(labelText: 'RST Rcvd'),
                             keyboardType: TextInputType.number,
                           ),
@@ -99,6 +139,11 @@ class LogEntryPage extends HookConsumerWidget {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: sigInfoController,
+                      style: TextStyle(
+                        color: brightness == Brightness.dark
+                            ? AppColors.darkOnSurface
+                            : Colors.black87,
+                      ),
                       decoration: const InputDecoration(
                         labelText: 'Hunter Park (Sig Info)',
                         hintText: 'e.g. KFF-1234',
@@ -109,42 +154,69 @@ class LogEntryPage extends HookConsumerWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () async {
-                  if (callsignController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please enter a callsign')),
-                    );
-                    return;
-                  }
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.primaryGreen,
+                      AppColors.primaryGreen.withOpacity(0.8),
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryGreen.withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (callsignController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please enter a callsign')),
+                      );
+                      return;
+                    }
 
-                  final now = DateTime.now().toUtc();
-                  final log = QsoLog()
-                    ..callsign = callsignController.text.toUpperCase()
-                    ..qsoDate = now
-                    ..timeOn = DateFormat('HHmmss').format(now)
-                    ..band = selectedBand.value
-                    ..mode = selectedMode.value
-                    ..rstSent = rstSentController.text
-                    ..rstRcvd = rstRcvdController.text
-                    ..sigInfo = sigInfoController.text.toUpperCase()
-                    ..sig = sigInfoController.text.isNotEmpty ? 'WWFF' : null
-                    ..stationCallsign = profile.defaultCallsign ?? ''
-                    ..operatorCallsign = profile.defaultOperator ?? ''
-                    ..mySig = 'WWFF'
-                    ..mySigInfo = profile.defaultMySigInfo ?? ''
-                    ..txPower = profile.defaultTxPower
-                    ..comment = commentController.text;
+                    final now = DateTime.now().toUtc();
+                    final log = QsoLog()
+                      ..callsign = callsignController.text.toUpperCase()
+                      ..qsoDate = now
+                      ..timeOn = DateFormat('HHmmss').format(now)
+                      ..band = selectedBand.value
+                      ..mode = selectedMode.value
+                      ..rstSent = rstSentController.text
+                      ..rstRcvd = rstRcvdController.text
+                      ..sigInfo = sigInfoController.text.toUpperCase()
+                      ..sig = sigInfoController.text.isNotEmpty ? 'WWFF' : null
+                      ..stationCallsign = profile.defaultCallsign ?? ''
+                      ..operatorCallsign = profile.defaultOperator ?? ''
+                      ..mySig = 'WWFF'
+                      ..mySigInfo = profile.defaultMySigInfo ?? ''
+                      ..txPower = profile.defaultTxPower
+                      ..comment = commentController.text;
 
-                  await ref.read(qsoRepositoryProvider).addLog(log);
-                  if (context.mounted) context.pop();
-                },
-                child: const Text('Save QSO'),
+                    await ref.read(qsoRepositoryProvider).addLog(log);
+                    if (context.mounted) context.pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: const Text('Save QSO'),
+                ),
               ),
             ],
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(
+          child: CircularProgressIndicator(
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
     );

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/theme/app_theme.dart';
+import 'core/theme/gradient_background.dart';
 import 'core/utils/database_service.dart';
 import 'core/router/app_router.dart';
+import 'features/settings/data/repositories/settings_repository.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
@@ -30,12 +32,22 @@ class WwffApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
-    
-    return MaterialApp.router(
-      title: 'WWFF on the GO',
-      theme: AppTheme.lightTheme,
-      debugShowCheckedModeBanner: false,
-      routerConfig: router,
+    final profileAsync = ref.watch(userProfileProvider);
+
+    final isDark = profileAsync.whenOrNull(
+          data: (profile) => profile?.isDarkTheme ?? false,
+        ) ??
+        false;
+
+    return GradientBackground(
+      child: MaterialApp.router(
+        title: 'WWFF on the GO',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+        debugShowCheckedModeBanner: false,
+        routerConfig: router,
+      ),
     );
   }
 }

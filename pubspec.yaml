@@ -33,8 +33,13 @@ dependencies:
   latlong2: ^0.9.1
   url_launcher: ^6.3.1
   csv: ^8.0.0
-  flutter_map_marker_cluster: ^1.4.0
+  flutter_map_supercluster:
+    git:
+      url: https://github.com/tobesucht/flutter_map_supercluster.git
+      ref: fm_7
+  vector_map_tiles: ^8.0.0
   firedart: ^0.9.8
+
 
 dev_dependencies:
   flutter_test:
