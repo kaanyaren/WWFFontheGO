@@ -3,7 +3,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/theme/glass_card.dart';
 import '../../data/repositories/park_repository.dart';
+import '../../data/services/park_sync_service.dart';
 import '../../domain/models/park.dart';
+import '../widgets/park_map_view.dart';
 
 class ParkListPage extends HookConsumerWidget {
   const ParkListPage({super.key});
@@ -12,6 +14,7 @@ class ParkListPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final searchController = useTextEditingController();
     final searchQuery = useState('');
+    final isMapView = useState(true); // Default to map as requested
     final parkListAsync = ref.watch(parkListProvider);
 
     return Scaffold(
@@ -19,19 +22,32 @@ class ParkListPage extends HookConsumerWidget {
         title: const Text('WWFF Parks'),
         actions: [
           IconButton(
+            icon: Icon(isMapView.value ? Icons.list : Icons.map),
+            onPressed: () => isMapView.value = !isMapView.value,
+            tooltip: isMapView.value ? 'Show List' : 'Show Map',
+          ),
+          IconButton(
             icon: const Icon(Icons.sync),
             onPressed: () async {
               try {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Syncing parks from Firebase...')),
+                  const SnackBar(content: Text('Starting full sync from CSV...')),
                 );
+                // Trigger the CSV import to Firestore
+                await ref.read(parkSyncServiceProvider).importParksFromCsv();
+                // Then sync from Firestore to Local
                 await ref.read(parkRepositoryProvider).syncParksFromFirestore();
+                
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Sync completed!')),
+                );
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Firebase Error: Please check configuration.')),
+                  SnackBar(content: Text('Sync Error: $e')),
                 );
               }
             },
+            tooltip: 'Sync with WWFF Directory',
           ),
         ],
       ),
@@ -66,7 +82,23 @@ class ParkListPage extends HookConsumerWidget {
                 }).toList();
 
                 if (filteredParks.isEmpty) {
-                  return const Center(child: Text('No parks found. Try syncing!'));
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('No parks found.'),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => ref.read(parkRepositoryProvider).syncParksFromFirestore(),
+                          child: const Text('Refresh from Database'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                if (isMapView.value) {
+                  return ParkMapView(parks: filteredParks);
                 }
 
                 return ListView.builder(
@@ -134,6 +166,7 @@ class ParkListPage extends HookConsumerWidget {
       ),
     );
   }
+
 
   Widget _buildPlaceholder() {
     return Container(

@@ -29,8 +29,11 @@ class ParkRepository {
           ..reference = data['reference'] ?? ''
           ..name = data['name'] ?? ''
           ..state = data['state'] ?? ''
-          ..imageUrl = data['imageUrl'];
+          ..imageUrl = data['imageUrl']
+          ..latitude = (data['latitude'] as num?)?.toDouble()
+          ..longitude = (data['longitude'] as num?)?.toDouble();
       }).toList();
+
 
       await isar.writeTxn(() async {
         await isar.parks.putAll(parks);

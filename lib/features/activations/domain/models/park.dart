@@ -13,6 +13,10 @@ class Park {
   late String state;
   String? imageUrl;
   
+  // Latitude and Longitude for Map
+  double? latitude;
+  double? longitude;
+  
   // For offline search
   @Index(type: IndexType.value)
   List<String> get searchKeywords => [
@@ -21,3 +25,4 @@ class Park {
     state.toLowerCase(),
   ];
 }
+

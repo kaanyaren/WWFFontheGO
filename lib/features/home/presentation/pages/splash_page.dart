@@ -15,7 +15,9 @@ class SplashPage extends StatelessWidget {
       pageTransitionType: PageTransitionType.fade,
       backgroundColor: Colors.white,
       splashIconSize: 200,
-      duration: 2500,
+      duration: 0,
+      animationDuration: const Duration(milliseconds: 400),
     );
+
   }
 }

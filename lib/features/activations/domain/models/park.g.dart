@@ -22,18 +22,28 @@ const ParkSchema = CollectionSchema(
       name: r'imageUrl',
       type: IsarType.string,
     ),
-    r'name': PropertySchema(id: 1, name: r'name', type: IsarType.string),
-    r'reference': PropertySchema(
+    r'latitude': PropertySchema(
+      id: 1,
+      name: r'latitude',
+      type: IsarType.double,
+    ),
+    r'longitude': PropertySchema(
       id: 2,
+      name: r'longitude',
+      type: IsarType.double,
+    ),
+    r'name': PropertySchema(id: 3, name: r'name', type: IsarType.string),
+    r'reference': PropertySchema(
+      id: 4,
       name: r'reference',
       type: IsarType.string,
     ),
     r'searchKeywords': PropertySchema(
-      id: 3,
+      id: 5,
       name: r'searchKeywords',
       type: IsarType.stringList,
     ),
-    r'state': PropertySchema(id: 4, name: r'state', type: IsarType.string),
+    r'state': PropertySchema(id: 6, name: r'state', type: IsarType.string),
   },
 
   estimateSize: _parkEstimateSize,
@@ -110,10 +120,12 @@ void _parkSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.imageUrl);
-  writer.writeString(offsets[1], object.name);
-  writer.writeString(offsets[2], object.reference);
-  writer.writeStringList(offsets[3], object.searchKeywords);
-  writer.writeString(offsets[4], object.state);
+  writer.writeDouble(offsets[1], object.latitude);
+  writer.writeDouble(offsets[2], object.longitude);
+  writer.writeString(offsets[3], object.name);
+  writer.writeString(offsets[4], object.reference);
+  writer.writeStringList(offsets[5], object.searchKeywords);
+  writer.writeString(offsets[6], object.state);
 }
 
 Park _parkDeserialize(
@@ -125,9 +137,11 @@ Park _parkDeserialize(
   final object = Park();
   object.id = id;
   object.imageUrl = reader.readStringOrNull(offsets[0]);
-  object.name = reader.readString(offsets[1]);
-  object.reference = reader.readString(offsets[2]);
-  object.state = reader.readString(offsets[4]);
+  object.latitude = reader.readDoubleOrNull(offsets[1]);
+  object.longitude = reader.readDoubleOrNull(offsets[2]);
+  object.name = reader.readString(offsets[3]);
+  object.reference = reader.readString(offsets[4]);
+  object.state = reader.readString(offsets[6]);
   return object;
 }
 
@@ -141,12 +155,16 @@ P _parkDeserializeProp<P>(
     case 0:
       return (reader.readStringOrNull(offset)) as P;
     case 1:
-      return (reader.readString(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 2:
-      return (reader.readString(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 3:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readString(offset)) as P;
     case 4:
+      return (reader.readString(offset)) as P;
+    case 5:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 6:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -740,6 +758,186 @@ extension ParkQueryFilter on QueryBuilder<Park, Park, QFilterCondition> {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(property: r'imageUrl', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterFilterCondition> latitudeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'latitude'),
+      );
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterFilterCondition> latitudeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'latitude'),
+      );
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterFilterCondition> latitudeEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'latitude',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterFilterCondition> latitudeGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'latitude',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterFilterCondition> latitudeLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'latitude',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterFilterCondition> latitudeBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'latitude',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterFilterCondition> longitudeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'longitude'),
+      );
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterFilterCondition> longitudeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'longitude'),
+      );
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterFilterCondition> longitudeEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'longitude',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterFilterCondition> longitudeGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'longitude',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterFilterCondition> longitudeLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'longitude',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterFilterCondition> longitudeBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'longitude',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+
+          epsilon: epsilon,
+        ),
       );
     });
   }
@@ -1400,6 +1598,30 @@ extension ParkQuerySortBy on QueryBuilder<Park, Park, QSortBy> {
     });
   }
 
+  QueryBuilder<Park, Park, QAfterSortBy> sortByLatitude() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'latitude', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterSortBy> sortByLatitudeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'latitude', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterSortBy> sortByLongitude() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'longitude', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterSortBy> sortByLongitudeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'longitude', Sort.desc);
+    });
+  }
+
   QueryBuilder<Park, Park, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -1462,6 +1684,30 @@ extension ParkQuerySortThenBy on QueryBuilder<Park, Park, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Park, Park, QAfterSortBy> thenByLatitude() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'latitude', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterSortBy> thenByLatitudeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'latitude', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterSortBy> thenByLongitude() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'longitude', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Park, Park, QAfterSortBy> thenByLongitudeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'longitude', Sort.desc);
+    });
+  }
+
   QueryBuilder<Park, Park, QAfterSortBy> thenByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -1508,6 +1754,18 @@ extension ParkQueryWhereDistinct on QueryBuilder<Park, Park, QDistinct> {
     });
   }
 
+  QueryBuilder<Park, Park, QDistinct> distinctByLatitude() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'latitude');
+    });
+  }
+
+  QueryBuilder<Park, Park, QDistinct> distinctByLongitude() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'longitude');
+    });
+  }
+
   QueryBuilder<Park, Park, QDistinct> distinctByName({
     bool caseSensitive = true,
   }) {
@@ -1549,6 +1807,18 @@ extension ParkQueryProperty on QueryBuilder<Park, Park, QQueryProperty> {
   QueryBuilder<Park, String?, QQueryOperations> imageUrlProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'imageUrl');
+    });
+  }
+
+  QueryBuilder<Park, double?, QQueryOperations> latitudeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'latitude');
+    });
+  }
+
+  QueryBuilder<Park, double?, QQueryOperations> longitudeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'longitude');
     });
   }
 
