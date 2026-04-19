@@ -55,7 +55,7 @@ class ParkRepository {
       
       // Use compute to parse in background if needed, but for simplicity here we parse directly
       // as Isar write is the main bottleneck.
-      final converter = const CsvToListConverter();
+      final converter = CsvToListConverter();
       final rows = converter.convert(dataLines, shouldParseNumbers: false);
       
       if (rows.isEmpty) return;
