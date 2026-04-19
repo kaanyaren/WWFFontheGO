@@ -74,8 +74,6 @@ class _ParkMapViewState extends ConsumerState<ParkMapView> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-
     final markers = widget.parks.where((p) {
       final lat = p.latitude;
       final lon = p.longitude;

@@ -110,7 +110,7 @@ class SettingsPage extends HookConsumerWidget {
                   ),
                   value: profile.isDarkTheme,
                   onChanged: (val) => _updateProfile(ref, profile, isDarkTheme: val),
-                  activeColor: Theme.of(context).primaryColor,
+                  activeThumbColor: Theme.of(context).primaryColor,
                   dense: true,
                 ),
               ),

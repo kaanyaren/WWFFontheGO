@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/glass_card.dart';
 import '../../../../core/widgets/animated_list_item.dart';
@@ -9,6 +10,10 @@ import '../../../../core/widgets/shimmer_loading.dart';
 import '../../data/repositories/park_repository.dart';
 import '../widgets/park_map_view.dart';
 import '../../domain/models/park.dart';
+
+final searchParksProvider = FutureProvider.autoDispose.family<List<Park>, String>((ref, query) {
+  return ref.watch(parkRepositoryProvider).searchParks(query);
+});
 
 class ParkListPage extends HookConsumerWidget {
   const ParkListPage({super.key});
@@ -18,7 +23,11 @@ class ParkListPage extends HookConsumerWidget {
     final searchController = useTextEditingController();
     final searchQuery = useState('');
     final isMapView = useState(true); // Default to map as requested
+    
+    // We keep watchAllParks just to check if we need initial sync
     final parkListAsync = ref.watch(parkListProvider);
+    final searchParksAsync = ref.watch(searchParksProvider(searchQuery.value));
+    
     final brightness = Theme.of(context).brightness;
 
     useEffect(() {
@@ -36,20 +45,13 @@ class ParkListPage extends HookConsumerWidget {
         children: [
           // Main Content (Map or List)
           Positioned.fill(
-            child: parkListAsync.when(
+            child: searchParksAsync.when(
               data: (parks) {
-                final filteredParks = parks.where((p) {
-                  final query = searchQuery.value.toLowerCase();
-                  return p.reference.toLowerCase().contains(query) ||
-                      p.name.toLowerCase().contains(query) ||
-                      p.state.toLowerCase().contains(query);
-                }).toList();
-
                 if (isMapView.value) {
-                  return ParkMapView(parks: filteredParks);
+                  return ParkMapView(parks: parks);
                 }
 
-                if (filteredParks.isEmpty) {
+                if (parks.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -71,9 +73,9 @@ class ParkListPage extends HookConsumerWidget {
 
                 return ListView.builder(
                   padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 84, 16, 16),
-                  itemCount: filteredParks.length,
+                  itemCount: parks.length,
                   itemBuilder: (context, index) {
-                    final park = filteredParks[index];
+                    final park = parks[index];
                     return AnimatedListItem(
                       index: index,
                       child: Padding(
@@ -87,12 +89,13 @@ class ParkListPage extends HookConsumerWidget {
                                 if (park.imageUrl != null)
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
-                                      park.imageUrl!,
+                                    child: CachedNetworkImage(
+                                      imageUrl: park.imageUrl!,
                                       width: 60,
                                       height: 60,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => _buildPlaceholder(brightness),
+                                      placeholder: (context, url) => const ShimmerLoading(width: 60, height: 60),
+                                      errorWidget: (context, url, error) => _buildPlaceholder(brightness),
                                     ),
                                   )
                                 else

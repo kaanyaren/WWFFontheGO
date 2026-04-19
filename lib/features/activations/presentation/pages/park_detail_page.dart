@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -8,7 +9,7 @@ import '../../../../core/theme/gradient_background.dart';
 import '../../domain/models/park.dart';
 import '../../data/repositories/park_image_service.dart';
 
-class ParkDetailPage extends HookWidget {
+class ParkDetailPage extends HookConsumerWidget {
   final Park park;
 
   const ParkDetailPage({super.key, required this.park});
@@ -27,7 +28,7 @@ class ParkDetailPage extends HookWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final brightness = Theme.of(context).brightness;
     final isDark = brightness == Brightness.dark;
     
@@ -36,7 +37,7 @@ class ParkDetailPage extends HookWidget {
 
     useEffect(() {
       if (park.latitude != null && park.longitude != null) {
-        ParkImageService().getParkImageUrl(park.latitude!, park.longitude!, park.name).then((url) {
+        ref.read(parkImageServiceProvider).getParkImageUrl(park.latitude!, park.longitude!, park.name).then((url) {
           imageUrlState.value = url;
           isLoadingImage.value = false;
         });

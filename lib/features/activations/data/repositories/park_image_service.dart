@@ -1,7 +1,15 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/network/dio_provider.dart';
+
+final parkImageServiceProvider = Provider<ParkImageService>((ref) {
+  return ParkImageService(ref.watch(dioProvider));
+});
 
 class ParkImageService {
-  final Dio _dio = Dio();
+  final Dio _dio;
+
+  ParkImageService(this._dio);
 
   /// Tries to fetch a relevant park image from Wikipedia based on coordinates.
   /// Falls back to a free static map if no Wikipedia image is found.
