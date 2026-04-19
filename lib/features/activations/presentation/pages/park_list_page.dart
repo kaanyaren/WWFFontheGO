@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/glass_card.dart';
 import '../../../../core/widgets/animated_list_item.dart';
 import '../../../../core/widgets/shimmer_loading.dart';
 import '../../data/repositories/park_repository.dart';
-
 import '../widgets/park_map_view.dart';
 
 class ParkListPage extends HookConsumerWidget {
@@ -68,32 +68,39 @@ class ParkListPage extends HookConsumerWidget {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
             child: GlassCard(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              borderRadius: 20,
-              child: TextField(
-                controller: searchController,
-                style: TextStyle(
-                  color: brightness == Brightness.dark
-                      ? AppColors.darkOnSurface
-                      : Colors.black87,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Search by reference or name...',
-                  hintStyle: TextStyle(
-                    color: AppColors.subtext(brightness).withOpacity(0.6),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+              borderRadius: 16,
+              child: SizedBox(
+                height: 44,
+                child: TextField(
+                  controller: searchController,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: brightness == Brightness.dark
+                        ? AppColors.darkOnSurface
+                        : Colors.black87,
                   ),
-                  prefixIcon: Icon(
-                    Icons.search_rounded,
-                    color: AppColors.subtext(brightness),
+                  decoration: InputDecoration(
+                    hintText: 'Search by reference or name...',
+                    hintStyle: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.subtext(brightness).withOpacity(0.6),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search_rounded,
+                      color: AppColors.subtext(brightness),
+                      size: 20,
+                    ),
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    filled: false,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
                   ),
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  filled: false,
+                  onChanged: (val) => searchQuery.value = val,
                 ),
-                onChanged: (val) => searchQuery.value = val,
               ),
             ),
           ),
@@ -146,6 +153,7 @@ class ParkListPage extends HookConsumerWidget {
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: ScaleOnTap(
+                          onTap: () => context.push('/park-detail', extra: park),
                           child: GlassCard(
                             padding: const EdgeInsets.all(16),
                             child: Row(

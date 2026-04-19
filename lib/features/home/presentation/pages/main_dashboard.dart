@@ -15,8 +15,8 @@ class MainDashboard extends ConsumerStatefulWidget {
 }
 
 class _MainDashboardState extends ConsumerState<MainDashboard> {
-  final _pageController = PageController(initialPage: 0);
-  final NotchBottomBarController _controller = NotchBottomBarController(index: 0);
+  final _pageController = PageController(initialPage: 1);
+  final NotchBottomBarController _controller = NotchBottomBarController(index: 1);
 
   @override
   void dispose() {
@@ -30,8 +30,8 @@ class _MainDashboardState extends ConsumerState<MainDashboard> {
     final isDark = brightness == Brightness.dark;
 
     final List<Widget> bottomBarPages = [
-      const ParkListPage(),
       const SpotsPage(),
+      const ParkListPage(),
       const SettingsPage(),
     ];
 
@@ -64,19 +64,19 @@ class _MainDashboardState extends ConsumerState<MainDashboard> {
         bottomBarItems: [
           BottomBarItem(
             inActiveItem: Icon(
-              Icons.forest_outlined,
-              color: isDark ? AppColors.darkSubtext : Colors.blueGrey,
-            ),
-            activeItem: const Icon(Icons.forest, color: Colors.white),
-            itemLabel: 'Parks',
-          ),
-          BottomBarItem(
-            inActiveItem: Icon(
               Icons.radar_outlined,
               color: isDark ? AppColors.darkSubtext : Colors.blueGrey,
             ),
             activeItem: const Icon(Icons.radar, color: Colors.white),
             itemLabel: 'Spots',
+          ),
+          BottomBarItem(
+            inActiveItem: Icon(
+              Icons.forest_outlined,
+              color: isDark ? AppColors.darkSubtext : Colors.blueGrey,
+            ),
+            activeItem: const Icon(Icons.forest, color: Colors.white),
+            itemLabel: 'Map',
           ),
           BottomBarItem(
             inActiveItem: Icon(

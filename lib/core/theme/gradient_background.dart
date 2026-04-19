@@ -5,12 +5,13 @@ import 'app_colors.dart';
 /// Includes subtle decorative circles for depth.
 class GradientBackground extends StatelessWidget {
   final Widget child;
+  final Brightness? forceBrightness;
 
-  const GradientBackground({super.key, required this.child});
+  const GradientBackground({super.key, required this.child, this.forceBrightness});
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
+    final brightness = forceBrightness ?? Theme.of(context).brightness;
     final colors = AppColors.gradientColors(brightness);
 
     return Container(

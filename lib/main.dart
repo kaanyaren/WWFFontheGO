@@ -39,15 +39,19 @@ class WwffApp extends ConsumerWidget {
         ) ??
         false;
 
-    return GradientBackground(
-      child: MaterialApp.router(
-        title: 'WWFF on the GO',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-        debugShowCheckedModeBanner: false,
-        routerConfig: router,
-      ),
+    return MaterialApp.router(
+      title: 'WWFF on the GO',
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+      debugShowCheckedModeBanner: false,
+      routerConfig: router,
+      builder: (context, child) {
+        return GradientBackground(
+          forceBrightness: isDark ? Brightness.dark : Brightness.light,
+          child: child!,
+        );
+      },
     );
   }
 }

@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/home/presentation/pages/main_dashboard.dart';
 import '../../features/home/presentation/pages/splash_page.dart';
 import '../../features/logging/presentation/pages/log_entry_page.dart';
+import '../../features/activations/presentation/pages/park_detail_page.dart';
+import '../../features/activations/domain/models/park.dart';
 import '../../features/spots/domain/models/spot.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -23,6 +25,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final spot = state.extra as WwffSpot?;
           return LogEntryPage(preFillSpot: spot);
+        },
+      ),
+      GoRoute(
+        path: '/park-detail',
+        builder: (context, state) {
+          final park = state.extra as Park;
+          return ParkDetailPage(park: park);
         },
       ),
     ],

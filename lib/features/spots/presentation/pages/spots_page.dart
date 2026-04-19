@@ -67,7 +67,7 @@ class SpotsPage extends ConsumerWidget {
                           border: Border(
                             left: BorderSide(
                               color: _getModeColor(spot.mode),
-                              width: 5,
+                              width: 6,
                             ),
                           ),
                         ),
@@ -76,32 +76,22 @@ class SpotsPage extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      spot.callsign,
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: -0.5,
-                                        color: brightness == Brightness.dark
-                                            ? AppColors.darkOnSurface
-                                            : Colors.black87,
-                                      ),
+                                Expanded(
+                                  child: Text(
+                                    spot.callsign,
+                                    style: TextStyle(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: -1.0,
+                                      height: 1.0,
+                                      color: brightness == Brightness.dark
+                                          ? Colors.white
+                                          : Colors.black87,
                                     ),
-                                    Text(
-                                      'by ${spot.spotter}',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: AppColors.subtext(brightness).withOpacity(0.8),
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                                const Spacer(),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                   decoration: BoxDecoration(
@@ -122,16 +112,24 @@ class SpotsPage extends ConsumerWidget {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 12),
                             Row(
                               children: [
+                                if (spot.band.isNotEmpty) ...[
+                                  _buildInfoChip(
+                                    context,
+                                    Icons.layers_outlined,
+                                    spot.band,
+                                    Colors.purple,
+                                    brightness,
+                                  ),
+                                  const SizedBox(width: 8),
+                                ],
                                 _buildInfoChip(
                                   context,
                                   Icons.settings_input_antenna_rounded,
-                                  spot.freq,
-                                  brightness == Brightness.dark
-                                      ? Colors.blue.shade300
-                                      : Colors.blue,
+                                  '${spot.freq} MHz',
+                                  Colors.blue,
                                   brightness,
                                 ),
                                 const SizedBox(width: 8),
@@ -142,12 +140,44 @@ class SpotsPage extends ConsumerWidget {
                                   _getModeColor(spot.mode),
                                   brightness,
                                 ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.person_pin_circle_outlined,
+                                  size: 14,
+                                  color: AppColors.subtext(brightness).withOpacity(0.7),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'by ',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.subtext(brightness).withOpacity(0.5),
+                                  ),
+                                ),
+                                Text(
+                                  spot.spotter,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.subtext(brightness).withOpacity(0.9),
+                                  ),
+                                ),
                                 const Spacer(),
+                                Icon(
+                                  Icons.access_time_rounded,
+                                  size: 14,
+                                  color: AppColors.subtext(brightness).withOpacity(0.7),
+                                ),
+                                const SizedBox(width: 4),
                                 Text(
                                   DateFormat('HH:mm').format(spot.spotTime),
                                   style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
                                     color: AppColors.subtext(brightness),
                                   ),
                                 ),
@@ -155,7 +185,7 @@ class SpotsPage extends ConsumerWidget {
                                   ' UTC',
                                   style: TextStyle(
                                     fontSize: 10,
-                                    color: AppColors.subtext(brightness),
+                                    color: AppColors.subtext(brightness).withOpacity(0.7),
                                   ),
                                 ),
                               ],
@@ -164,12 +194,17 @@ class SpotsPage extends ConsumerWidget {
                               const SizedBox(height: 12),
                               Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.all(10),
+                                padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: brightness == Brightness.dark
                                       ? Colors.white.withOpacity(0.05)
                                       : Colors.black.withOpacity(0.03),
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: brightness == Brightness.dark
+                                        ? Colors.white.withOpacity(0.05)
+                                        : Colors.black.withOpacity(0.05),
+                                  ),
                                 ),
                                 child: Text(
                                   spot.comments!,
