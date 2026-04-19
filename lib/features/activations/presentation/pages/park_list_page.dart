@@ -21,10 +21,16 @@ class ParkListPage extends HookConsumerWidget {
           IconButton(
             icon: const Icon(Icons.sync),
             onPressed: () async {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Syncing parks from Firebase...')),
-              );
-              await ref.read(parkRepositoryProvider).syncParksFromFirestore();
+              try {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Syncing parks from Firebase...')),
+                );
+                await ref.read(parkRepositoryProvider).syncParksFromFirestore();
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Firebase Error: Please check configuration.')),
+                );
+              }
             },
           ),
         ],

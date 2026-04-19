@@ -14,17 +14,19 @@ class SettingsPage extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
+        scrolledUnderElevation: 0,
       ),
       body: profileAsync.when(
         data: (profile) {
           if (profile == null) return const Center(child: Text('No Profile Found'));
 
           return ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             children: [
               _buildSectionTitle(context, 'Station Information'),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               GlassCard(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 child: Column(
                   children: [
                     _buildTextField(
@@ -33,14 +35,14 @@ class SettingsPage extends HookConsumerWidget {
                       onChanged: (val) => _updateProfile(ref, profile, defaultCallsign: val),
                       icon: Icons.badge_outlined,
                     ),
-                    const Divider(height: 32),
+                    const Divider(height: 1),
                     _buildTextField(
                       label: 'Default Operator',
                       initialValue: profile.defaultOperator ?? '',
                       onChanged: (val) => _updateProfile(ref, profile, defaultOperator: val),
                       icon: Icons.person_outline,
                     ),
-                    const Divider(height: 32),
+                    const Divider(height: 1),
                     _buildTextField(
                       label: 'Current Park (My Sig Info)',
                       initialValue: profile.defaultMySigInfo ?? '',
@@ -48,7 +50,7 @@ class SettingsPage extends HookConsumerWidget {
                       icon: Icons.location_on_outlined,
                       hint: 'e.g. TAFF-0001',
                     ),
-                    const Divider(height: 32),
+                    const Divider(height: 1),
                     _buildNumberField(
                       label: 'Default TX Power (W)',
                       initialValue: profile.defaultTxPower ?? 10,
@@ -58,19 +60,21 @@ class SettingsPage extends HookConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
               _buildSectionTitle(context, 'App Preferences'),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               GlassCard(
+                padding: EdgeInsets.zero,
                 child: SwitchListTile(
-                  title: const Text('Dark Theme'),
-                  secondary: const Icon(Icons.dark_mode_outlined),
+                  title: const Text('Dark Theme', style: TextStyle(fontSize: 14)),
+                  secondary: const Icon(Icons.dark_mode_outlined, size: 20),
                   value: profile.isDarkTheme,
                   onChanged: (val) => _updateProfile(ref, profile, isDarkTheme: val),
                   activeColor: Theme.of(context).primaryColor,
+                  dense: true,
                 ),
               ),
-              const SizedBox(height: 80), // Space for bottom bar
+              const SizedBox(height: 100),
             ],
           );
         },
@@ -81,12 +85,16 @@ class SettingsPage extends HookConsumerWidget {
   }
 
   Widget _buildSectionTitle(BuildContext context, String title) {
-    return Text(
-      title,
-      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).primaryColor,
-          ),
+    return Padding(
+      padding: const EdgeInsets.only(left: 4),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+              fontSize: 12,
+            ),
+      ),
     );
   }
 
@@ -99,14 +107,18 @@ class SettingsPage extends HookConsumerWidget {
   }) {
     return TextFormField(
       initialValue: initialValue,
+      style: const TextStyle(fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: const TextStyle(fontSize: 12),
         hintText: hint,
-        prefixIcon: Icon(icon),
+        prefixIcon: Icon(icon, size: 20),
         border: InputBorder.none,
         enabledBorder: InputBorder.none,
         focusedBorder: InputBorder.none,
         filled: false,
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(vertical: 12),
       ),
       onChanged: onChanged,
     );
@@ -121,13 +133,17 @@ class SettingsPage extends HookConsumerWidget {
     return TextFormField(
       initialValue: initialValue.toString(),
       keyboardType: TextInputType.number,
+      style: const TextStyle(fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon),
+        labelStyle: const TextStyle(fontSize: 12),
+        prefixIcon: Icon(icon, size: 20),
         border: InputBorder.none,
         enabledBorder: InputBorder.none,
         focusedBorder: InputBorder.none,
         filled: false,
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(vertical: 12),
       ),
       onChanged: (val) {
         final parsed = int.tryParse(val);

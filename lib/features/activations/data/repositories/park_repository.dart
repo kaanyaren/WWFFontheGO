@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/park.dart';
 import '../../../../core/utils/database_service.dart';

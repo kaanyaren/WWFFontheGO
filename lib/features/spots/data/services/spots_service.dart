@@ -21,7 +21,7 @@ class SpotsService {
 
   Future<List<WwffSpot>> fetchSpots() async {
     try {
-      final response = await dio.get('https://wwff.co/static/spots.json');
+      final response = await dio.get('https://spots.wwff.co/static/spots.json');
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         return data.map((json) => WwffSpot.fromJson(json)).toList();
