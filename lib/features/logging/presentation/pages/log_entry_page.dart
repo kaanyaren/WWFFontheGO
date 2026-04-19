@@ -7,22 +7,25 @@ import '../../../../core/theme/glass_card.dart';
 import '../../data/repositories/qso_repository.dart';
 import '../../domain/models/qso_log.dart';
 import '../../../settings/data/repositories/settings_repository.dart';
+import '../../../spots/domain/models/spot.dart';
 
 class LogEntryPage extends HookConsumerWidget {
-  const LogEntryPage({super.key});
+  final WwffSpot? preFillSpot;
+
+  const LogEntryPage({super.key, this.preFillSpot});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(userProfileProvider);
     
-    final callsignController = useTextEditingController();
+    final callsignController = useTextEditingController(text: preFillSpot?.callsign ?? '');
     final rstSentController = useTextEditingController(text: '59');
     final rstRcvdController = useTextEditingController(text: '59');
-    final sigInfoController = useTextEditingController();
-    final commentController = useTextEditingController();
+    final sigInfoController = useTextEditingController(text: preFillSpot?.wwff ?? '');
+    final commentController = useTextEditingController(text: preFillSpot?.comments ?? '');
     
-    final selectedBand = useState('20m');
-    final selectedMode = useState('SSB');
+    final selectedBand = useState(preFillSpot != null ? _freqToBand(preFillSpot!.freq) : '20m');
+    final selectedMode = useState(preFillSpot?.mode ?? 'SSB');
 
     return Scaffold(
       appBar: AppBar(
@@ -145,5 +148,18 @@ class LogEntryPage extends HookConsumerWidget {
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
     );
+  }
+
+  String _freqToBand(String freqStr) {
+    final freq = double.tryParse(freqStr) ?? 0;
+    if (freq >= 3.5 && freq <= 4.0) return '80m';
+    if (freq >= 7.0 && freq <= 7.3) return '40m';
+    if (freq >= 10.1 && freq <= 10.15) return '30m';
+    if (freq >= 14.0 && freq <= 14.35) return '20m';
+    if (freq >= 18.068 && freq <= 18.168) return '17m';
+    if (freq >= 21.0 && freq <= 21.45) return '15m';
+    if (freq >= 24.89 && freq <= 24.99) return '12m';
+    if (freq >= 28.0 && freq <= 29.7) return '10m';
+    return '20m';
   }
 }

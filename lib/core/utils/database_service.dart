@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/logging/domain/models/qso_log.dart';
 import '../../features/settings/domain/models/user_profile.dart';
+import '../../features/activations/domain/models/park.dart';
 
 // We initialize this in main.dart and pass it to ProviderScope
 final databaseServiceProvider = Provider<DatabaseService>((ref) {
@@ -16,7 +17,7 @@ class DatabaseService {
   Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
     isar = await Isar.open(
-      [QsoLogSchema, UserProfileSchema],
+      [QsoLogSchema, UserProfileSchema, ParkSchema],
       directory: dir.path,
     );
     

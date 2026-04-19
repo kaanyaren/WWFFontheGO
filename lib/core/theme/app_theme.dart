@@ -37,8 +37,8 @@ class AppTheme {
         ),
         iconTheme: const IconThemeData(color: primaryColor),
       ),
-      cardTheme: CardTheme(
-        color: cardColor.withOpacity(0.85), // Slight transparency for an organic/glass-like base feel
+      cardTheme: CardThemeData(
+        color: cardColor.withOpacity(0.85),
         elevation: 4,
         shadowColor: secondaryColor.withOpacity(0.2),
         shape: RoundedRectangleBorder(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/theme/glass_card.dart';
 import '../../data/repositories/settings_repository.dart';
@@ -11,7 +10,6 @@ class SettingsPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(userProfileProvider);
-    final repository = ref.watch(settingsRepositoryProvider);
 
     return Scaffold(
       appBar: AppBar(

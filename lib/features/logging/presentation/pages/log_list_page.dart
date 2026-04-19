@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../../core/theme/glass_card.dart';
 import '../../data/repositories/qso_repository.dart';
 import '../../domain/models/qso_log.dart';
+import '../../../../core/utils/adif_generator.dart';
 
 class LogListPage extends ConsumerWidget {
   const LogListPage({super.key});
@@ -20,7 +22,15 @@ class LogListPage extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.share_outlined),
             onPressed: () {
-              // TODO: Implement ADIF Export
+              final logs = qsoListAsync.value ?? [];
+              if (logs.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('No logs to export')),
+                );
+                return;
+              }
+              final adif = AdifGenerator.generate(logs);
+              Share.share(adif, subject: 'WWFF_Export_${DateFormat('yyyyMMdd').format(DateTime.now())}.adif');
             },
           ),
         ],
