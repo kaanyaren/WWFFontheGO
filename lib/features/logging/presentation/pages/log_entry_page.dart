@@ -160,12 +160,12 @@ class LogEntryPage extends HookConsumerWidget {
                   gradient: LinearGradient(
                     colors: [
                       AppColors.primaryGreen,
-                      AppColors.primaryGreen.withOpacity(0.8),
+                      AppColors.primaryGreen.withValues(alpha: 0.8),
                     ],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primaryGreen.withOpacity(0.3),
+                      color: AppColors.primaryGreen.withValues(alpha: 0.3),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),

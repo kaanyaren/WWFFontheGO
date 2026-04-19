@@ -36,7 +36,7 @@ class SpotsPage extends ConsumerWidget {
                   Icon(
                     Icons.radar_outlined,
                     size: 64,
-                    color: AppColors.subtext(brightness).withOpacity(0.4),
+                    color: AppColors.subtext(brightness).withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -95,10 +95,10 @@ class SpotsPage extends ConsumerWidget {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                    color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color: Theme.of(context).primaryColor.withOpacity(0.3),
+                                      color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
                                     ),
                                   ),
                                   child: Text(
@@ -148,14 +148,14 @@ class SpotsPage extends ConsumerWidget {
                                 Icon(
                                   Icons.person_pin_circle_outlined,
                                   size: 14,
-                                  color: AppColors.subtext(brightness).withOpacity(0.7),
+                                  color: AppColors.subtext(brightness).withValues(alpha: 0.7),
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   'by ',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: AppColors.subtext(brightness).withOpacity(0.5),
+                                    color: AppColors.subtext(brightness).withValues(alpha: 0.5),
                                   ),
                                 ),
                                 Text(
@@ -163,14 +163,14 @@ class SpotsPage extends ConsumerWidget {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.subtext(brightness).withOpacity(0.9),
+                                    color: AppColors.subtext(brightness).withValues(alpha: 0.9),
                                   ),
                                 ),
                                 const Spacer(),
                                 Icon(
                                   Icons.access_time_rounded,
                                   size: 14,
-                                  color: AppColors.subtext(brightness).withOpacity(0.7),
+                                  color: AppColors.subtext(brightness).withValues(alpha: 0.7),
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
@@ -185,7 +185,7 @@ class SpotsPage extends ConsumerWidget {
                                   ' UTC',
                                   style: TextStyle(
                                     fontSize: 10,
-                                    color: AppColors.subtext(brightness).withOpacity(0.7),
+                                    color: AppColors.subtext(brightness).withValues(alpha: 0.7),
                                   ),
                                 ),
                               ],
@@ -197,13 +197,13 @@ class SpotsPage extends ConsumerWidget {
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: brightness == Brightness.dark
-                                      ? Colors.white.withOpacity(0.05)
-                                      : Colors.black.withOpacity(0.03),
+                                      ? Colors.white.withValues(alpha: 0.05)
+                                      : Colors.black.withValues(alpha: 0.03),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
                                     color: brightness == Brightness.dark
-                                        ? Colors.white.withOpacity(0.05)
-                                        : Colors.black.withOpacity(0.05),
+                                        ? Colors.white.withValues(alpha: 0.05)
+                                        : Colors.black.withValues(alpha: 0.05),
                                   ),
                                 ),
                                 child: Text(
@@ -213,7 +213,7 @@ class SpotsPage extends ConsumerWidget {
                                     fontStyle: FontStyle.italic,
                                     color: brightness == Brightness.dark
                                         ? AppColors.darkSubtext
-                                        : Colors.black.withOpacity(0.7),
+                                        : Colors.black.withValues(alpha: 0.7),
                                     height: 1.4,
                                   ),
                                 ),
@@ -257,7 +257,7 @@ class SpotsPage extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(brightness == Brightness.dark ? 0.15 : 0.1),
+        color: color.withValues(alpha: brightness == Brightness.dark ? 0.15 : 0.1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
@@ -270,7 +270,7 @@ class SpotsPage extends ConsumerWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: color.withOpacity(0.9),
+              color: color.withValues(alpha: 0.9),
             ),
           ),
         ],

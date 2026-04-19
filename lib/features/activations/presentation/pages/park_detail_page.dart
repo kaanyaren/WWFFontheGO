@@ -73,7 +73,7 @@ class ParkDetailPage extends HookWidget {
                         )
                       else if (isLoadingImage.value)
                         Container(
-                          color: AppColors.primaryGreen.withOpacity(0.1),
+                          color: AppColors.primaryGreen.withValues(alpha: 0.1),
                           child: const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen)),
                         )
                       else
@@ -86,9 +86,9 @@ class ParkDetailPage extends HookWidget {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              Colors.black.withOpacity(0.3),
+                              Colors.black.withValues(alpha: 0.3),
                               Colors.transparent,
-                              Colors.black.withOpacity(0.5),
+                              Colors.black.withValues(alpha: 0.5),
                             ],
                           ),
                         ),
@@ -126,7 +126,7 @@ class ParkDetailPage extends HookWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryGreen.withOpacity(0.15),
+                          color: AppColors.primaryGreen.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -210,7 +210,7 @@ class ParkDetailPage extends HookWidget {
   Widget _buildFallbackMap(String url) {
     if (url.isEmpty) {
       return Container(
-        color: AppColors.primaryGreen.withOpacity(0.1),
+        color: AppColors.primaryGreen.withValues(alpha: 0.1),
         child: const Icon(Icons.park_rounded, size: 64, color: AppColors.primaryGreen),
       );
     }
@@ -218,7 +218,7 @@ class ParkDetailPage extends HookWidget {
       url,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) => Container(
-        color: AppColors.primaryGreen.withOpacity(0.1),
+        color: AppColors.primaryGreen.withValues(alpha: 0.1),
         child: const Icon(Icons.park_rounded, size: 64, color: AppColors.primaryGreen),
       ),
     );

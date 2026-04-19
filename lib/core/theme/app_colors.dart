@@ -17,9 +17,9 @@ class AppColors {
   static const lightDivider = Color(0xFFE0E8E0);
 
   // Light glass
-  static Color lightGlassFill = Colors.white.withOpacity(0.65);
-  static Color lightGlassBorder = Colors.white.withOpacity(0.4);
-  static Color lightGlassShadow = primaryGreen.withOpacity(0.08);
+  static Color lightGlassFill = Colors.white.withValues(alpha: 0.65);
+  static Color lightGlassBorder = Colors.white.withValues(alpha: 0.4);
+  static Color lightGlassShadow = primaryGreen.withValues(alpha: 0.08);
 
   // Light gradient stops
   static const lightGradientTop = Color(0xFFE8F5E9);
@@ -34,9 +34,9 @@ class AppColors {
   static const darkDivider = Color(0xFF1E3A2E);
 
   // Dark glass
-  static Color darkGlassFill = const Color(0xFF1A3A2A).withOpacity(0.55);
-  static Color darkGlassBorder = const Color(0xFF2E8B57).withOpacity(0.2);
-  static Color darkGlassShadow = Colors.black.withOpacity(0.3);
+  static Color darkGlassFill = const Color(0xFF1A3A2A).withValues(alpha: 0.55);
+  static Color darkGlassBorder = const Color(0xFF2E8B57).withValues(alpha: 0.2);
+  static Color darkGlassShadow = Colors.black.withValues(alpha: 0.3);
 
   // Dark gradient stops
   static const darkGradientTop = Color(0xFF0A1A12);

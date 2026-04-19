@@ -125,7 +125,7 @@ class SettingsPage extends HookConsumerWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: AppColors.primaryGreen.withOpacity(0.1),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -231,7 +231,7 @@ class SettingsPage extends HookConsumerWidget {
         ),
         hintText: hint,
         hintStyle: TextStyle(
-          color: AppColors.subtext(brightness).withOpacity(0.5),
+          color: AppColors.subtext(brightness).withValues(alpha: 0.5),
         ),
         prefixIcon: Icon(
           icon,

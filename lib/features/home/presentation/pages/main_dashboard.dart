@@ -45,8 +45,8 @@ class _MainDashboardState extends ConsumerState<MainDashboard> {
       bottomNavigationBar: AnimatedNotchBottomBar(
         notchBottomBarController: _controller,
         color: isDark
-            ? AppColors.darkSurface.withOpacity(0.85)
-            : Colors.white.withOpacity(0.9),
+            ? AppColors.darkSurface.withValues(alpha: 0.85)
+            : Colors.white.withValues(alpha: 0.9),
         showLabel: true,
         textOverflow: TextOverflow.visible,
         notchColor: Theme.of(context).primaryColor,

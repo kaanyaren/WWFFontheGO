@@ -90,6 +90,9 @@ lib/core/secrets/api_keys.dart
 # Node dependencies
 **/node_modules/
 
+# Environment
+.env
+
 # Firebase Admin SDK
 wwfonthego-firebase-adminsdk-fbsvc-206e3aeee4.json
 google-services (*).json

@@ -34,30 +34,38 @@ class ParkRepository {
     try {
       print('Downloading WWFF Directory CSV...');
       final dio = Dio();
+      // WWFF CSV might be large, use a reasonable timeout
+      dio.options.connectTimeout = const Duration(seconds: 30);
+      dio.options.receiveTimeout = const Duration(minutes: 5);
+      
       final response = await dio.get('https://wwff.co/wwff-data/wwff_directory.csv');
       
       if (response.statusCode != 200) {
         throw Exception('Failed to download CSV: ${response.statusCode}');
       }
 
-      final csvContent = response.data.toString();
-      print('Parsing CSV into records...');
+      String csvContent = response.data.toString();
       
-      // Split into lines and find header
-      final lines = csvContent.split('\n');
-      final headerIndex = lines.indexWhere((l) => l.startsWith('reference,status'));
+      print('CSV length: ${csvContent.length} chars');
       
-      if (headerIndex == -1) {
+      // Robust header finding
+      int headerStart = csvContent.indexOf('reference,status');
+      if (headerStart == -1) {
         throw Exception('CSV header not found');
       }
-
-      final dataLines = lines.skip(headerIndex).join('\n');
       
-      // Use compute to parse in background if needed, but for simplicity here we parse directly
-      // as Isar write is the main bottleneck.
+      final dataLines = csvContent.substring(headerStart);
+      
+      print('Parsing CSV into records...');
+      // Csv class in version 8.0.0
       final rows = csv.decode(dataLines);
       
-      if (rows.isEmpty) return;
+      if (rows.isEmpty) {
+        print('CSV parsed into 0 rows');
+        return;
+      }
+      
+      print('Found ${rows.length} rows including header');
       
       final headers = rows.first.map((e) => e.toString()).toList();
       final refIdx = headers.indexOf('reference');
@@ -66,53 +74,84 @@ class ParkRepository {
       final latIdx = headers.indexOf('latitude');
       final lonIdx = headers.indexOf('longitude');
       final statusIdx = headers.indexOf('status');
+      
+      print('Indexes: ref=$refIdx, status=$statusIdx, name=$nameIdx, state=$stateIdx, lat=$latIdx, lon=$lonIdx');
+
+      if (refIdx == -1 || statusIdx == -1 || latIdx == -1) {
+        throw Exception('Required columns missing in CSV');
+      }
 
       final parks = <Park>[];
+      int activeCount = 0;
+      int skippedCount = 0;
+
       for (var i = 1; i < rows.length; i++) {
         final row = rows[i];
-        if (row.length <= statusIdx) continue;
-        
-        final status = row[statusIdx].toString().toLowerCase();
-        if (status != 'active') continue;
-
-        final park = Park()
-          ..reference = row[refIdx].toString()
-          ..name = row[nameIdx].toString()
-          ..state = row[stateIdx].toString();
-        
-        final latStr = row[latIdx].toString();
-        final lonStr = row[lonIdx].toString();
-        
-        if (latStr.isNotEmpty && lonStr.isNotEmpty) {
-          park.latitude = double.tryParse(latStr);
-          park.longitude = double.tryParse(lonStr);
+        if (row.length <= statusIdx || row.length <= latIdx || row.length <= lonIdx) {
+          skippedCount++;
+          continue;
         }
         
-        parks.add(park);
+        final status = row[statusIdx].toString().trim().toLowerCase();
+        if (status != 'active') {
+          continue;
+        }
+        
+        activeCount++;
+
+        final park = Park()
+          ..reference = row[refIdx].toString().trim()
+          ..name = row[nameIdx].toString().trim()
+          ..state = row[stateIdx].toString().trim();
+        
+        final latVal = row[latIdx];
+        final lonVal = row[lonIdx];
+        
+        if (latVal != null && lonVal != null) {
+          park.latitude = double.tryParse(latVal.toString());
+          park.longitude = double.tryParse(lonVal.toString());
+        }
+        
+        // Final validation: Reference and Lat/Lon must be present for map
+        if (park.reference.isNotEmpty && park.latitude != null && park.longitude != null) {
+           parks.add(park);
+        } else {
+           skippedCount++;
+        }
       }
 
-      print('Saving ${parks.length} active parks to local database...');
+      print('Total parsed: ${rows.length}, Active: $activeCount, Valid for Map: ${parks.length}, Skipped: $skippedCount');
       
-      // Write in batches of 5000 to keep UI responsive
-      for (var i = 0; i < parks.length; i += 5000) {
-        final batch = parks.sublist(i, (i + 5000) > parks.length ? parks.length : i + 5000);
-        await isar.writeTxn(() async {
-          await isar.parks.putAll(batch);
-        });
-        print('Saved ${i + batch.length}/${parks.length} parks...');
+      if (parks.isEmpty) {
+        print('No valid parks found to save.');
+        return;
       }
+
+      print('Clearing old parks and saving ${parks.length} new parks...');
+      
+      await isar.writeTxn(() async {
+        // We clear existing parks to ensure we have the latest directory
+        // and to fix any previous half-syncs
+        await isar.parks.clear();
+        
+        // Write in batches of 5000 to keep UI responsive
+        for (var i = 0; i < parks.length; i += 5000) {
+          final end = (i + 5000) > parks.length ? parks.length : i + 5000;
+          final batch = parks.sublist(i, end);
+          await isar.parks.putAll(batch);
+          print('Saved ${end}/${parks.length} parks...');
+        }
+      });
 
       print('Local database sync complete.');
-    } catch (e) {
+    } catch (e, stack) {
       print('CSV Sync Error: $e');
+      print(stack);
+      rethrow;
     } finally {
       _isSyncing = false;
     }
   }
-
-
-
-
 
   Stream<List<Park>> watchAllParks() {
     return isar.parks.where().sortByReference().watch(fireImmediately: true);

@@ -48,7 +48,7 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
     final isDark = brightness == Brightness.dark;
 
     final baseColor = isDark ? const Color(0xFF1A3A2A) : const Color(0xFFE8F5E9);
-    final highlightColor = isDark ? const Color(0xFF2E8B57).withOpacity(0.3) : Colors.white.withOpacity(0.5);
+    final highlightColor = isDark ? const Color(0xFF2E8B57).withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.5);
 
     return AnimatedBuilder(
       animation: _animation,

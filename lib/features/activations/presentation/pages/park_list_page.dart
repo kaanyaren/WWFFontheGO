@@ -8,6 +8,7 @@ import '../../../../core/widgets/animated_list_item.dart';
 import '../../../../core/widgets/shimmer_loading.dart';
 import '../../data/repositories/park_repository.dart';
 import '../widgets/park_map_view.dart';
+import '../../domain/models/park.dart';
 
 class ParkListPage extends HookConsumerWidget {
   const ParkListPage({super.key});
@@ -30,81 +31,11 @@ class ParkListPage extends HookConsumerWidget {
     }, [parkListAsync.hasValue]);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('WWFFontheGO'),
-        actions: [
-          IconButton(
-            icon: Icon(isMapView.value ? Icons.list_rounded : Icons.map_rounded),
-            onPressed: () => isMapView.value = !isMapView.value,
-            tooltip: isMapView.value ? 'Show List' : 'Show Map',
-          ),
-          IconButton(
-            icon: const Icon(Icons.sync_rounded),
-            onPressed: () async {
-              try {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Syncing from WWFF Directory...')),
-                );
-                // Sync from Firestore to Local
-                await ref.read(parkRepositoryProvider).syncParksFromCSV();
-
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Sync completed!')),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Sync Error: $e')),
-                  );
-                }
-              }
-            },
-            tooltip: 'Sync with Cloud Database',
-          ),
-        ],
-      ),
-      body: Column(
+      extendBodyBehindAppBar: true,
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-            child: GlassCard(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-              borderRadius: 16,
-              child: SizedBox(
-                height: 44,
-                child: TextField(
-                  controller: searchController,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: brightness == Brightness.dark
-                        ? AppColors.darkOnSurface
-                        : Colors.black87,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'Search by reference or name...',
-                    hintStyle: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.subtext(brightness).withOpacity(0.6),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search_rounded,
-                      color: AppColors.subtext(brightness),
-                      size: 20,
-                    ),
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    filled: false,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                  onChanged: (val) => searchQuery.value = val,
-                ),
-              ),
-            ),
-          ),
-          Expanded(
+          // Main Content (Map or List)
+          Positioned.fill(
             child: parkListAsync.when(
               data: (parks) {
                 final filteredParks = parks.where((p) {
@@ -114,6 +45,10 @@ class ParkListPage extends HookConsumerWidget {
                       p.state.toLowerCase().contains(query);
                 }).toList();
 
+                if (isMapView.value) {
+                  return ParkMapView(parks: filteredParks);
+                }
+
                 if (filteredParks.isEmpty) {
                   return Center(
                     child: Column(
@@ -122,29 +57,20 @@ class ParkListPage extends HookConsumerWidget {
                         Icon(
                           Icons.forest_outlined,
                           size: 64,
-                          color: AppColors.subtext(brightness).withOpacity(0.4),
+                          color: AppColors.subtext(brightness).withValues(alpha: 0.4),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'No parks found.',
                           style: TextStyle(color: AppColors.subtext(brightness)),
                         ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () => ref.read(parkRepositoryProvider).syncParksFromCSV(),
-                          child: const Text('Refresh from Database'),
-                        ),
                       ],
                     ),
                   );
                 }
 
-                if (isMapView.value) {
-                  return ParkMapView(parks: filteredParks);
-                }
-
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 84, 16, 16),
                   itemCount: filteredParks.length,
                   itemBuilder: (context, index) {
                     final park = filteredParks[index];
@@ -180,7 +106,7 @@ class ParkListPage extends HookConsumerWidget {
                                         park.reference,
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Theme.of(context).primaryColor,
+                                          color: AppColors.primaryGreen,
                                           fontSize: 16,
                                         ),
                                       ),
@@ -225,6 +151,73 @@ class ParkListPage extends HookConsumerWidget {
               ),
             ),
           ),
+
+          // Floating Search Bar
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 12,
+            left: 16,
+            right: 16,
+            child: GlassCard(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+              borderRadius: 20,
+              opacity: 0.8,
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(isMapView.value ? Icons.list_rounded : Icons.map_rounded),
+                    onPressed: () => isMapView.value = !isMapView.value,
+                    color: AppColors.primaryGreen,
+                    tooltip: isMapView.value ? 'Show List' : 'Show Map',
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: searchController,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: brightness == Brightness.dark
+                            ? AppColors.darkOnSurface
+                            : Colors.black87,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Search by reference or name...',
+                        hintStyle: TextStyle(
+                          fontSize: 15,
+                          color: AppColors.subtext(brightness).withValues(alpha: 0.6),
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                      onChanged: (val) => searchQuery.value = val,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.sync_rounded),
+                    color: AppColors.primaryGreen,
+                    tooltip: 'Sync WWFF Directory',
+                    onPressed: () async {
+                      try {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Syncing WWFF Directory...')),
+                        );
+                        await ref.read(parkRepositoryProvider).syncParksFromCSV();
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Sync completed!')),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Sync Error: $e')),
+                          );
+                        }
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -235,14 +228,14 @@ class ParkListPage extends HookConsumerWidget {
       width: 60,
       height: 60,
       decoration: BoxDecoration(
-        color: AppColors.primaryGreen.withOpacity(
+        color: AppColors.primaryGreen.withValues(alpha: 
           brightness == Brightness.dark ? 0.15 : 0.1,
         ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Icon(
         Icons.forest,
-        color: AppColors.primaryGreen.withOpacity(0.6),
+        color: AppColors.primaryGreen.withValues(alpha: 0.6),
       ),
     );
   }

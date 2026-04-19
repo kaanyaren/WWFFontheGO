@@ -48,7 +48,7 @@ class LogListPage extends ConsumerWidget {
                   Icon(
                     Icons.history_outlined,
                     size: 64,
-                    color: AppColors.subtext(brightness).withOpacity(0.4),
+                    color: AppColors.subtext(brightness).withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -106,12 +106,12 @@ class LogListPage extends ConsumerWidget {
             gradient: LinearGradient(
               colors: [
                 AppColors.primaryGreen,
-                AppColors.primaryGreen.withOpacity(0.8),
+                AppColors.primaryGreen.withValues(alpha: 0.8),
               ],
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primaryGreen.withOpacity(0.3),
+                color: AppColors.primaryGreen.withValues(alpha: 0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -156,7 +156,7 @@ class LogListPage extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.primaryGreen.withOpacity(
+                color: AppColors.primaryGreen.withValues(alpha: 
                   brightness == Brightness.dark ? 0.2 : 0.1,
                 ),
                 borderRadius: BorderRadius.circular(8),
@@ -176,7 +176,7 @@ class LogListPage extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(
+                color: Colors.blue.withValues(alpha: 
                   brightness == Brightness.dark ? 0.15 : 0.1,
                 ),
                 borderRadius: BorderRadius.circular(8),

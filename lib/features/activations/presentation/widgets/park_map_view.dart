@@ -102,7 +102,7 @@ class _ParkMapViewState extends ConsumerState<ParkMapView> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primaryGreen.withOpacity(0.4),
+                    color: AppColors.primaryGreen.withValues(alpha: 0.4),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -144,14 +144,14 @@ class _ParkMapViewState extends ConsumerState<ParkMapView> {
                   return Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(22),
-                      color: AppColors.primaryGreen.withOpacity(0.85),
+                      color: AppColors.primaryGreen.withValues(alpha: 0.85),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.6),
+                        color: Colors.white.withValues(alpha: 0.6),
                         width: 2,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primaryGreen.withOpacity(0.3),
+                          color: AppColors.primaryGreen.withValues(alpha: 0.3),
                           blurRadius: 10,
                           offset: const Offset(0, 2),
                         ),

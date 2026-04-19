@@ -23,8 +23,8 @@ class GlassCard extends StatelessWidget {
     final brightness = Theme.of(context).brightness;
     final fillColor = opacity != null
         ? (brightness == Brightness.dark
-            ? const Color(0xFF1A3A2A).withOpacity(opacity!)
-            : Colors.white.withOpacity(opacity!))
+            ? const Color(0xFF1A3A2A).withValues(alpha: opacity!)
+            : Colors.white.withValues(alpha: opacity!))
         : AppColors.glassFill(brightness);
     final borderColor = AppColors.glassBorder(brightness);
     final shadowColor = AppColors.glassShadow(brightness);
