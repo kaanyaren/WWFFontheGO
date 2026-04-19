@@ -10,9 +10,13 @@ if (!SERVICE_ACCOUNT) {
   process.exit(1);
 }
 
+// Strip BOM if present
+const cleanServiceAccount = SERVICE_ACCOUNT.trim().replace(/^\uFEFF/, '');
+
 admin.initializeApp({
-  credential: admin.credential.cert(JSON.parse(SERVICE_ACCOUNT))
+  credential: admin.credential.cert(JSON.parse(cleanServiceAccount))
 });
+
 
 const db = admin.firestore();
 

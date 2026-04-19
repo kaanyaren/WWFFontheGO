@@ -30,7 +30,8 @@ class ParkSyncService {
       if (startIndex == -1) throw Exception('Invalid CSV format: Header not found');
       
       final cleanedCsvData = lines.sublist(startIndex).join('\n');
-      final List<List<dynamic>> rows = const CsvToListConverter().convert(cleanedCsvData);
+      final List<List<dynamic>> rows = CsvToListConverter().convert(cleanedCsvData);
+
 
       if (rows.length < 2) return;
 
